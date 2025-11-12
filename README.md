@@ -16,7 +16,7 @@ Each player’s text data is processed separately to count and analyze words fro
 
 
 ## Classes & Functionality
-
+## Milestone 1
 ### `CurryWordCounter.java`
 - **Purpose:** Reads and counts words from Steph Curry’s text files (`Curry1.txt`, `Curry2.txt`, `Curry3.txt`).  
 - **Key Methods:**
@@ -46,39 +46,57 @@ These classes modularize the reading process for each player:
 - **`ReadLebronFiles.java`**
 - **`ReadMJFiles.java`**
 
+## Milestone 2 Updates!
+- `WordCounter` consumes **CleanedWords** directly
+- `CountPlayerWords(List<String>)` returns **frequencies** aligned to the words' first appearance
+- `UniqueWords` returns **only words that appear once** in an article
+- `WordCountList(List<String>)` builds a **ranked frequency list** of all the words (bubble sort) and displays it in descending order
+
+### `VocabAnalysis.Java`
+- Analyzes the words in a given article and uses text files full of positive and negative words to:
+- Keep track of how many positive and negative words appear in the article
+- Determine whether the overall tone of the article was positive or negative
+
+### `Main.java`
+- Added a main class which allows the user to interact with the program, and choose which player and which article they would like to view
+
 ## UML Class Diagram
 
 ```mermaid
 classDiagram
-  direction LR
+  class main {
+    +static void main(String[] args)
+    -List<String> CleanedWords
+    -List<Integer> WordCount
+    -List<String> UniqueWords
+}
 
-  class CurryWordCounter {
-    +main(String[] args) void
-    -processFile(String path) int
-  }
+class ReadFile {
++List<String> getWords(String player,int fileIndex)
+      +List<String> getWordsFromPath(String path)
+    }
 
-  class LebronWordCounter {
-    +main(String[] args) void
-    -processFile(String path) int
-  }
+    class WordRemover {
+      +List<String> removeStopwords(List<String> tokens, String stopwordPath)
+    }
 
-  class MJWordCounter {
-    +main(String[] args) void
-    -processFile(String path) int
-  }
+    class WordCounter {
+      +List<Integer> CountPlayerWords(List<String> CleanedWords)
+      +List<String> getUniqueWords(List<String> CleanedWords)
+      +void WordCountList(List<String> CleanedWords)
+      -- internal --
+      <<private>> class WordCount
+      - String word
+      - int count
+    }
 
-  class ReadCurryFiles {
-    +countWords(String filePath) int
-  }
+    class VocabAnalysis {
+      <<static>> String POS
+      <<static>> String NEG
+      +Map<String,Integer> analyzePlayerFile(List<String> cleanedWords)
+    }
 
-  class ReadLebronFiles {
-    +countWords(String filePath) int
-  }
-
-  class ReadMJFiles {
-    +countWords(String filePath) int
-  }
-
-  CurryWordCounter --> ReadCurryFiles : uses
-  LebronWordCounter --> ReadLebronFiles : uses
-  MJWordCounter --> ReadMJFiles : uses
+    main --> ReadFile : loads tokens
+    main --> WordRemover : removes stopwords
+    main --> WordCounter : counts, unique-once, ranking
+    main --> VocabAnalysis : sentiment counts
