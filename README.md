@@ -60,15 +60,15 @@ These classes modularize the reading process for each player:
 ### `Main.java`
 - Added a main class which allows the user to interact with the program, and choose which player and which article they would like to view
 
+## Milestone 3 Updates!
+- `WordCounter.java` & `Main.java` updated for high cohesion and low coupling
+
 ## UML Class Diagram
 
 ```mermaid
 classDiagram
   class main {
     +static void main(String[] args)
-    -List<String> CleanedWords
-    -List<Integer> WordCount
-    -List<String> UniqueWords
 }
 
 class ReadFile {
@@ -81,13 +81,10 @@ class ReadFile {
     }
 
     class WordCounter {
-      +List<Integer> CountPlayerWords(List<String> CleanedWords)
-      +List<String> getUniqueWords(List<String> CleanedWords)
-      +void WordCountList(List<String> CleanedWords)
-      -- internal --
-      <<private>> class WordCount
-      - String word
-      - int count
+      +int countWords(List<String>)
+      +Map<String, Integer> countFrequencies(List<String>)
+      +int countAppearanceOnce(Map<String, Integer>)
+      +List<Map.Entry<String,Integer>> rankFrequency(Map<String, Integer>)
     }
 
     class VocabAnalysis {
@@ -96,7 +93,7 @@ class ReadFile {
       +Map<String,Integer> analyzePlayerFile(List<String> cleanedWords)
     }
 
-    main --> ReadFile : loads tokens
+    main --> ReadFile : loads article words
     main --> WordRemover : removes stopwords
-    main --> WordCounter : counts, unique-once, ranking
-    main --> VocabAnalysis : sentiment counts
+    main --> WordCounter : counts and ranks words
+    main --> VocabAnalysis : analyzes sentiment
