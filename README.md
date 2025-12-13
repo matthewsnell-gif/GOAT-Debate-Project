@@ -62,6 +62,8 @@ These classes modularize the reading process for each player:
 
 ## Milestone 3 Updates!
 - `WordCounter.java` & `Main.java` updated for high cohesion and low coupling
+  - Made sure that `Main.java` only orchestrates, and simply calls the methods from `WordCounter.java`
+  - reworked the methods inside `Wordcounter.java` to support this
 
 ## UML Class Diagram
 
