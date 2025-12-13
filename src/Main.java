@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Main {
@@ -19,35 +21,44 @@ public class Main {
             System.err.println("Please select a number between 0 and 2.");
         }
 
-        // Access the file from the player variable at index file
-        List<String> File = ReadFile.getWords(player, file);
-        //create variable to call stopword file
-        String stopwordPath = "/Users/mattsnell/GOAT-Debate-Project/txtFiles/stopwords.txt";
-        //remove stopwords and print the List of remaining words in article
-        List<String> CleanedWords = WordRemover.removeStopwords(File, stopwordPath);
+        //Relative Paths
+        String stopwordPath = Paths.get("txtFiles", "stopwords.txt").toString();
+        String posPath = Paths.get("txtFiles", "positive-words.txt").toString();
+        String negPath = Paths.get("txtFiles", "negative-words.txt").toString();
 
-
-        System.out.println(CleanedWords);
-        WordCounter.CountPlayerWords(CleanedWords);
-
-        //analyze the cleaned article and count positive and negative words
         try {
-            VocabAnalysis analysis = new VocabAnalysis(
-                    "/Users/mattsnell/GOAT-Debate-Project/txtFiles/positive-words.txt",
-                    "/Users/mattsnell/GOAT-Debate-Project/txtFiles/negative-words.txt");
+            //Clean Words
+            List<String> words = ReadFile.getWords(player, file);
+            List<String> CleanedWords = WordRemover.removeStopwords(words, stopwordPath);
 
-            HashMap<String, Integer> result = analysis.analyzePlayerFile(CleanedWords);
-            System.out.println("Positive Words: " + result.get(VocabAnalysis.POS));
-            System.out.println("Negative Words: " + result.get(VocabAnalysis.NEG));
-            System.out.println(" ");
+            //Vocab Analysis
+            VocabAnalysis analysis = new VocabAnalysis(posPath, negPath);
+            HashMap<String, Integer> sentiment = analysis.analyzePlayerFile(CleanedWords);
+
+            int pos = sentiment.get(VocabAnalysis.POS);
+            int neg = sentiment.get(VocabAnalysis.NEG);
+
+            System.out.println("The positive words are: " + pos);
+            System.out.println("The negative words are: " + neg);
+            System.out.println();
 
             //Ranks words by frequencies
-            WordCounter.WordCountList(CleanedWords);
+            Map<String, Integer> frequency = WordCounter.countFrequencies(CleanedWords);
 
-            // create variables for the conditional which decides the overall tonality of article
-            int pos = result.get(VocabAnalysis.POS);
-            int neg = result.get(VocabAnalysis.NEG);
+            int once = WordCounter.countAppearingOnce(frequency);
 
+
+            System.out.println("Total Words (After Stopwords): " + CleanedWords.size());
+            System.out.println("Word Frequencies: " + frequency.size());
+            System.out.println("Total Words Appearing Once: " + once);
+            System.out.println();
+
+            System.out.println("Ranking Words by Frequency: ");
+            for (Map.Entry<String, Integer> entry : WordCounter.rankFrequency(frequency)) {
+                System.out.println(entry.getKey() + ": " + entry.getValue());
+            }
+
+            System.out.println();
             if (pos > neg) {
                 System.out.println("The Overall Tone of this Article was positive!");
             } else if (pos < neg) {

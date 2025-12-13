@@ -3,80 +3,72 @@ import java.util.*;
 import java.io.*;
 
 public final class WordCounter {
-        //Helper class which each word and the number of times it appears
-        private static class WordCount{
-           String word;
-           int count;
+    /**
+     * private constructor to prevent instantiation of this utility class
+     */
+    private WordCounter() {}
 
-           //Constructor
-           WordCount(String word, int count){
-               this.word = word;
-               this.count = count;
-           }
-       }
-       //Counts how many times a word appears in the file with removed Stopwords
-        public static void CountPlayerWords(List<String> CleanedWords) {
-            Map<String, Integer> frequency = new HashMap<>();
-            // loop through every single word + count frequencies
-            for (String word : CleanedWords) {
-                if (word == null || word.isEmpty()) {
-                    continue;
-                }
-                frequency.put(word, frequency.getOrDefault(word, 0) + 1);
-            }
-            //Separate Lists for eventual analysis
-            List<Integer>WordCount = new ArrayList<>(frequency.values());
-            List<String> UniqueWords = new ArrayList<>();
-
-            //Find all words which only appear once
-            for (Map.Entry<String, Integer> entry : frequency.entrySet()) {
-                if (entry.getValue() == 1) {
-                    UniqueWords.add(entry.getKey());
-                }
-            }
-            //print results
-            System.out.println("Word Count: " + WordCount.size());
-            System.out.println("Unique Words: " + UniqueWords.size());
-        }
-    //Builds a ranked list of words and how many times they appear in the file
-    public static void WordCountList(List<String> CleanedWords) {
-        ArrayList<WordCount> wordCountList = new ArrayList<>();
-
-        //loops through every word to track frequency
-        for (String word : CleanedWords) {
-            if (word == null || word.isEmpty()) {
+    /**
+     * Counts the total number of words in a list (non-null, non-empty)
+     * @param words the list of words to count
+     * @return the total number of valid words
+     */
+    public static int countWords(List<String> words) {
+        int total = 0;
+        for (String word : words) {
+            if (word==null) {
                 continue;
             }
-            boolean found = false;
-
-            //Check if the word previously exists
-            for (WordCount wordCount : wordCountList) {
-                if (wordCount.word.equals(word)) {
-                    wordCount.count++;
-                    found = true;
-                    break;
-                }
+            word = word.trim();
+            if (word.isEmpty()) {
+                continue;
             }
-            //If it doesn't previously exist, add it to the list starting at 1
-            if (!found) {
-                wordCountList.add(new WordCount(word, 1));
-            }
+            total++;
         }
-        //Bubble sort to sort the list in descending order
-        for (int i = 0; i < wordCountList.size() - 1; i++) {
-            for (int j = 0; j < wordCountList.size() - 1; j++) {
-                if (wordCountList.get(j).count < wordCountList.get(j + 1).count) {
-                    WordCount temp = wordCountList.get(j);
-                    wordCountList.set(j, wordCountList.get(j + 1));
-                    wordCountList.set(j + 1, temp);
-                }
-            }
-        }
-        //Print results
-        System.out.println("Word Ranking by Frequency: ");
-        for (WordCount wordCount : wordCountList) {
-            System.out.println(wordCount.word + ": " + wordCount.count);
-        }
+        return total;
     }
+
+
+    public static Map<String, Integer> countFrequencies(List<String> words) {
+        Map<String,Integer> freq = new HashMap<>();
+        for (String word : words) {
+            if (word==null) {
+                continue;
+            }
+            word = word.trim();
+            if (word.isEmpty()) {
+                continue;
+            }
+            freq.put(word, freq.getOrDefault(word,0) + 1);
+        }
+        return freq;
+    }
+
+    /**
+     * Count how many times unique words appear exactly once
+     * @param freq the amount of times a word appears
+     * @return each word's frequency
+     */
+    public static int countAppearingOnce(Map<String, Integer> freq) {
+        int once = 0;
+        for (int c : freq.values()) {
+            if (c == 1) {
+                once++;
+            }
+        }
+        return once;
+    }
+
+    /**
+     * Ranks words by frequency in descending order
+     * @param freq a map of word frequencies
+     * @return a list of map entries sorted from highest to lowest frequency
+     */
+    public static List<Map.Entry<String, Integer>> rankFrequency(Map<String, Integer> freq) {
+        List<Map.Entry<String, Integer>> ranked = new ArrayList<>(freq.entrySet());
+        ranked.sort((Map.Entry<String, Integer> a, Map.Entry<String, Integer> b) -> Integer.compare(b.getValue(), a.getValue()));
+        return ranked;
+    }
+
 }
 
